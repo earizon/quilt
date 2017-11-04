@@ -7,6 +7,13 @@
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
+    <properties>
+      <!-- These properties will be set by the Maven Dependency plugin -->
+      <annotatedJdk>${org.checkerframework:jdk8:jar}</annotatedJdk>
+      <!-- Uncomment to use the Type Annotations compiler. -->
+      <!-- <typeAnnotationsJavac>${org.checkerframework:compiler:jar}</typeAnnotationsJavac> -->
+    </properties>
+    
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.interledger</groupId>
     <artifactId>ilp-core</artifactId>
@@ -55,6 +62,75 @@
             <scope>test</scope>
         </dependency>
 
+       <!-- CHECKER FRAMEWORK START { -->
+       <dependency>
+         <groupId>org.checkerframework</groupId>
+         <artifactId>checker-qual</artifactId>
+          <!-- Use checker-qual7 if targeting Java 7 -->
+          <!-- <artifactId>checker-qual7</artifactId> -->
+         <version>2.2.2</version>
+       </dependency>
+       <dependency>
+         <groupId>org.checkerframework</groupId>
+         <artifactId>checker</artifactId>
+         <version>2.2.2</version>
+       </dependency>
+       <!-- The Type Annotations compiler. Uncomment if using annotations in comments. -->
+       <!-- <dependency>
+                  <groupId>org.checkerframework</groupId>
+         <artifactId>compiler</artifactId>
+         <version>2.2.2</version>
+       </dependency> -->
+       <dependency>
+         <groupId>org.checkerframework</groupId>
+         <artifactId>jdk8</artifactId>
+         <version>2.2.2</version>
+       </dependency>
+       <!-- } CHECKER FRAMEWORK END -->
     </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- This plugin will set properties values using dependency information -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!-- Change source and target to 1.7 to create .class files that can be run on a Java 7 JVM -->
+          <source>1.8</source>
+          <target>1.8</target>
+          <!-- Uncomment the following line to use the type annotations compiler. -->
+          <!-- <fork>true</fork> -->
+          <compilerArguments>
+            <Xmaxerrs>10000</Xmaxerrs>
+            <Xmaxwarns>10000</Xmaxwarns>
+          </compilerArguments>
+          <annotationProcessors>
+            <!-- Add all the checkers you want to enable here -->
+            <annotationProcessor>org.checkerframework.checker.nullness.NullnessChecker</annotationProcessor>
+          </annotationProcessors>
+          <compilerArgs>
+            <arg>-AprintErrorStack</arg>
+            <!-- location of the annotated JDK, which comes from a Maven dependency -->
+            <arg>-Xbootclasspath/p:${annotatedJdk}</arg>
+            <!-- Uncomment the following line to use the type annotations compiler. -->
+            <!-- <arg>-J-Xbootclasspath/p:${typeAnnotationsJavac}</arg> -->
+            <!-- Uncomment the following line to turn type-checking warnings into errors. -->
+            <!-- <arg>-Awarns</arg> -->
+          </compilerArgs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
