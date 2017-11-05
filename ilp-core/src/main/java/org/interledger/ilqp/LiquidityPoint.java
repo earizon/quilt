@@ -21,40 +21,14 @@ public interface LiquidityPoint extends Comparable<LiquidityPoint> {
    */
   BigInteger getOutputAmount();
 
-  /**
-   * Helper-method to access a new {@link Builder} instance.
-   *
-   * @return A {@link Builder}.
-   */
-  static Builder builder() {
-    return new Builder();
-  }
 
   class Builder {
 
-    private BigInteger inputAmount;
-    private BigInteger outputAmount;
-
-    /**
-     * Sets the input amount into the builder.
-     *
-     * @param inputAmount An instance of {@link BigInteger}.
-     * @return This {@link Builder} instance.
-     */
-    public Builder inputAmount(BigInteger inputAmount) {
-      this.inputAmount = Objects.requireNonNull(inputAmount);
-      return this;
-    }
-
-    /**
-     * Sets the output amount into the builder.
-     *
-     * @param outputAmount An instance of {@link BigInteger}.
-     * @return This {@link Builder} instance.
-     */
-    public Builder outputAmount(BigInteger outputAmount) {
-      this.outputAmount = Objects.requireNonNull(outputAmount);
-      return this;
+    final private BigInteger inputAmount;
+    final private BigInteger outputAmount;
+    Builder (BigInteger inputAmount, BigInteger outputAmount) {
+      this.inputAmount  = inputAmount;
+      this.outputAmount = outputAmount;
     }
 
     /**
@@ -66,8 +40,8 @@ public interface LiquidityPoint extends Comparable<LiquidityPoint> {
       return new Builder.Impl(this);
     }
 
-    public static Builder builder() {
-      return new Builder();
+    public static Builder builder(BigInteger inputAmount, BigInteger outputAmount) {
+      return new Builder(inputAmount, outputAmount);
     }
 
     /**
@@ -80,12 +54,8 @@ public interface LiquidityPoint extends Comparable<LiquidityPoint> {
 
       private Impl(final Builder builder) {
         Objects.requireNonNull(builder);
-
-        this.inputAmount =
-            Objects.requireNonNull(builder.inputAmount, "inputAmount must not be null!");
-
-        this.outputAmount =
-            Objects.requireNonNull(builder.outputAmount, "outputAmount must not be null!");
+        this.inputAmount = builder.inputAmount;
+        this.outputAmount = builder.outputAmount;
       }
 
       @Override

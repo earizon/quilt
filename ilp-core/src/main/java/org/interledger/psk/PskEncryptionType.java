@@ -36,8 +36,7 @@ public enum PskEncryptionType {
         return type;
       }
     }
-
-    return null;
+    return NONE; // TODO:(0) Recheck: Was returning null before checker tests
   }
 
   @Override

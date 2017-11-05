@@ -1,5 +1,7 @@
 package org.interledger.codecs;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,6 +21,7 @@ public interface Codec<T> {
    *
    * @throws IOException If anything goes wrong reading from the {@link InputStream}.
    */
+  @NonNull
   T read(CodecContext context, InputStream inputStream) throws IOException;
 
   /**

@@ -21,33 +21,18 @@ public interface QuoteLiquidityRequest extends QuoteRequest {
    * A builder for instances of {@link QuoteLiquidityRequest}.
    */
   class Builder {
-    private InterledgerAddress destinationAccount;
-    private Duration destinationHoldDuration;
+    final private InterledgerAddress destinationAccount;
+    final private Duration destinationHoldDuration;
 
-    public static Builder builder() {
-      return new Builder();
+    Builder(InterledgerAddress destinationAccount, Duration destinationHoldDuration) {
+      this.destinationAccount =  destinationAccount;
+      this.destinationHoldDuration = destinationHoldDuration;
     }
 
-    /**
-     * Set the destination account address into this builder.
-     *
-     * @param destinationAccount An instance of {@link InterledgerAddress}.
-     * @return This {@link Builder} instance.
-     */
-    public Builder destinationAccount(final InterledgerAddress destinationAccount) {
-      this.destinationAccount = Objects.requireNonNull(destinationAccount);
-      return this;
-    }
-
-    /**
-     * Set the destination hold duration into this builder.
-     *
-     * @param destinationHoldDuration An instance of {@link Duration}.
-     * @return This {@link Builder} instance.
-     */
-    public Builder destinationHoldDuration(final Duration destinationHoldDuration) {
-      this.destinationHoldDuration = Objects.requireNonNull(destinationHoldDuration);
-      return this;
+    public static Builder builder(InterledgerAddress destinationAccount, Duration destinationHoldDuration) {
+      Objects.requireNonNull(destinationAccount);
+      Objects.requireNonNull(destinationHoldDuration);
+      return new Builder(destinationAccount, destinationHoldDuration);
     }
 
     /**
@@ -71,13 +56,9 @@ public interface QuoteLiquidityRequest extends QuoteRequest {
        * @param builder A Builder used to construct {@link QuoteLiquidityRequest} instances.
        */
       private Impl(final Builder builder) {
-        Objects.requireNonNull(builder);
+        this.destinationAccount = builder.destinationAccount;
 
-        this.destinationAccount = Objects.requireNonNull(builder.destinationAccount,
-            "destinationAccount must not be null!");
-
-        this.destinationHoldDuration = Objects.requireNonNull(builder.destinationHoldDuration,
-            "destinationHoldDuration must not be null!");
+        this.destinationHoldDuration = builder.destinationHoldDuration;
       }
 
       @Override

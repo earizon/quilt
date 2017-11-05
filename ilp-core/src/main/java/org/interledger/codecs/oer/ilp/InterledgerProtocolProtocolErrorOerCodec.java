@@ -80,11 +80,8 @@ public class InterledgerProtocolProtocolErrorOerCodec implements InterledgerProt
     final byte[] data = context.read(OerOctetString.class, inputStream)
         .getValue();
 
-    return InterledgerProtocolError.builder()
-        .errorCode(errorCode)
-        .triggeredByAddress(triggeredByAddress)
-        .forwardedByAddresses(addressList)
-        .triggeredAt(triggeredAt)
+    return (new InterledgerProtocolError.Builder(errorCode, triggeredByAddress, addressList))
+        .setTriggeredAt(triggeredAt)
         .data(data)
         .build();
   }

@@ -15,15 +15,6 @@ import java.util.Objects;
 public interface InterledgerPaymentRequest {
 
   /**
-   * Get the default builder.
-   *
-   * @return a {@link Builder} instance.
-   */
-  static Builder builder() {
-    return new Builder();
-  }
-
-  /**
    * Get the version of this IPR (this interface represents Version 2).
    *
    * @return The version of the IPR (currently 2)
@@ -48,31 +39,16 @@ public interface InterledgerPaymentRequest {
 
   class Builder {
 
-    private InterledgerPayment interledgerPayment;
-    private Condition condition;
+    final private InterledgerPayment interledgerPayment;
+    final private Condition condition;
 
-    /**
-     * Set the Interledger Payment packet for this IPR.
-     *
-     * @param interledgerPayment The Interledger Payment packet to use when building this IPR
-     *
-     * @return this builder
-     */
-    public Builder payment(InterledgerPayment interledgerPayment) {
-      this.interledgerPayment = Objects.requireNonNull(interledgerPayment);
-      return this;
+    Builder(InterledgerPayment interledgerPayment, Condition condition) {
+      this.interledgerPayment = interledgerPayment;
+      this.condition          = condition;
     }
 
-    /**
-     * Set the Condition for this IPR.
-     *
-     * @param condition The {@link Condition} to use when building this IPR
-     *
-     * @return this builder
-     */
-    public Builder condition(Condition condition) {
-      this.condition = Objects.requireNonNull(condition);
-      return this;
+    public static Builder builder(InterledgerPayment interledgerPayment, Condition condition) {
+      return new Builder(interledgerPayment, condition);
     }
 
     /**

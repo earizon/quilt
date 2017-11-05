@@ -43,10 +43,10 @@ public class QuoteBySourceAmountRequestOerCodec implements QuoteBySourceAmountRe
     /* read the destination hold duration which is a unit32 */
     final long destinationHoldDuration = context.read(OerUint32.class, inputStream).getValue();
 
-    return QuoteBySourceAmountRequest.Builder.builder()
-        .destinationAccount(destinationAccount)
-        .sourceAmount(sourceAmount)
-        .destinationHoldDuration(Duration.of(destinationHoldDuration, ChronoUnit.MILLIS)).build();
+    return QuoteBySourceAmountRequest.Builder.builder(
+            destinationAccount, sourceAmount,
+            Duration.of(destinationHoldDuration,
+            ChronoUnit.MILLIS)).build();
   }
 
   @Override

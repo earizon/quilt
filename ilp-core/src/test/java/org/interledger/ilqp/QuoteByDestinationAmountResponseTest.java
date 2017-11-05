@@ -23,9 +23,7 @@ public class QuoteByDestinationAmountResponseTest {
   @Test
   public void testBuild() throws Exception {
     final QuoteByDestinationAmountResponse quoteResponse =
-        QuoteByDestinationAmountResponse.builder()
-            .sourceAmount(sourceAmount)
-            .sourceHoldDuration(sourceHoldDuration).build();
+        QuoteByDestinationAmountResponse.Builder.builder(sourceAmount,sourceHoldDuration).build();
 
     assertThat(quoteResponse.getSourceAmount(), is(sourceAmount));
     assertThat(quoteResponse.getSourceHoldDuration(), is(sourceHoldDuration));
@@ -34,9 +32,8 @@ public class QuoteByDestinationAmountResponseTest {
   @Test
   public void testZeroAmount() throws Exception {
     final QuoteByDestinationAmountResponse quoteRequest =
-        QuoteByDestinationAmountResponse.builder()
-            .sourceAmount(BigInteger.ZERO)
-            .sourceHoldDuration(sourceHoldDuration).build();
+        QuoteByDestinationAmountResponse.Builder.builder(BigInteger.ZERO,sourceHoldDuration)
+            .build();
 
     assertThat(quoteRequest.getSourceAmount(), is(BigInteger.ZERO));
     assertThat(quoteRequest.getSourceHoldDuration(), is(sourceHoldDuration));
@@ -45,9 +42,8 @@ public class QuoteByDestinationAmountResponseTest {
   @Test(expected = IllegalArgumentException.class)
   public void testNegativeAmount() throws Exception {
     try {
-      QuoteByDestinationAmountResponse.builder()
-          .sourceAmount(BigInteger.valueOf(-11L))
-          .sourceHoldDuration(sourceHoldDuration).build();
+      QuoteByDestinationAmountResponse.Builder.builder(
+              BigInteger.valueOf(-11L),sourceHoldDuration).build();
       fail();
     } catch (IllegalArgumentException e) {
       assertThat(e.getMessage(), is("destinationAmount must be at least 0!"));
@@ -56,47 +52,23 @@ public class QuoteByDestinationAmountResponseTest {
   }
 
   @Test
-  public void testBuildWithNullValues() throws Exception {
-    try {
-      QuoteByDestinationAmountResponse.builder().build();
-      fail();
-    } catch (NullPointerException e) {
-      assertThat(e.getMessage(), is("sourceAmount must not be null!"));
-    }
-
-    try {
-      QuoteByDestinationAmountResponse.builder()
-          .sourceAmount(sourceAmount)
-          .build();
-      fail();
-    } catch (NullPointerException e) {
-      assertThat(e.getMessage(), is("sourceHoldDuration must not be null!"));
-    }
-  }
-
-  @Test
   public void testEqualsHashCode() throws Exception {
     final QuoteByDestinationAmountResponse quoteResponse1 =
-        QuoteByDestinationAmountResponse.builder()
-            .sourceAmount(sourceAmount)
-            .sourceHoldDuration(sourceHoldDuration)
-            .build();
+        QuoteByDestinationAmountResponse.Builder.
+            builder(sourceAmount,sourceHoldDuration).build();
 
     final QuoteByDestinationAmountResponse quoteResponse2 =
-        QuoteByDestinationAmountResponse.builder()
-            .sourceAmount(sourceAmount)
-            .sourceHoldDuration(sourceHoldDuration)
-            .build();
+        QuoteByDestinationAmountResponse.Builder.
+                builder(sourceAmount, sourceHoldDuration).build();
 
     assertTrue(quoteResponse1.equals(quoteResponse2));
     assertTrue(quoteResponse2.equals(quoteResponse1));
     assertTrue(quoteResponse1.hashCode() == quoteResponse2.hashCode());
 
     {
-      final QuoteByDestinationAmountResponse quoteResponse3 = QuoteByDestinationAmountResponse
-          .builder()
-          .sourceAmount(sourceAmount)
-          .sourceHoldDuration(Duration.of(1L, ChronoUnit.SECONDS))
+      final QuoteByDestinationAmountResponse quoteResponse3 =
+              QuoteByDestinationAmountResponse.Builder
+          .builder(sourceAmount, Duration.of(1L, ChronoUnit.SECONDS))
           .build();
 
       assertFalse(quoteResponse1.equals(quoteResponse3));
@@ -105,10 +77,9 @@ public class QuoteByDestinationAmountResponseTest {
     }
 
     {
-      final QuoteByDestinationAmountResponse quoteResponse4 = QuoteByDestinationAmountResponse
-          .builder()
-          .sourceAmount(BigInteger.ONE)
-          .sourceHoldDuration(sourceHoldDuration)
+      final QuoteByDestinationAmountResponse quoteResponse4 =
+              QuoteByDestinationAmountResponse.Builder
+          .builder(BigInteger.ONE, sourceHoldDuration)
           .build();
 
       assertFalse(quoteResponse1.equals(quoteResponse4));

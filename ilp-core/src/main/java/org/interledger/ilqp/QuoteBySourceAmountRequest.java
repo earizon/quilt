@@ -24,59 +24,27 @@ public interface QuoteBySourceAmountRequest extends QuoteRequest {
   Duration getDestinationHoldDuration();
 
   /**
-   * Helper-method to access a new {@link Builder} instance.
-   *
-   * @return A {@link Builder}.
-   */
-  static Builder builder() {
-    return new Builder();
-  }
-
-  /**
    * A builder for instances of {@link QuoteBySourceAmountRequest}.
    */
   class Builder {
 
-    private InterledgerAddress destinationAccount;
-    private BigInteger sourceAmount;
-    private Duration destinationHoldDuration;
+    final private InterledgerAddress destinationAccount;
+    final private BigInteger sourceAmount;
+    final private Duration destinationHoldDuration;
 
-    public static Builder builder() {
-      return new Builder();
+    Builder(final InterledgerAddress destinationAccount, final BigInteger sourceAmount, final Duration destinationHoldDuration) {
+       this.destinationAccount      = destinationAccount ;
+       if (sourceAmount.compareTo(BigInteger.ZERO) < 0) {
+           throw new RuntimeException("destinationAmount must be at least 0!");
+       }
+       this.sourceAmount            = sourceAmount ;
+       this.destinationHoldDuration = destinationHoldDuration ;
     }
 
-    /**
-     * Set the destination account address into this builder.
-     *
-     * @param destinationAccount An instance of {@link InterledgerAddress}.
-     * @return This {@link Builder} instance.
-     */
-    public Builder destinationAccount(
-        final InterledgerAddress destinationAccount) {
-      this.destinationAccount = Objects.requireNonNull(destinationAccount);
-      return this;
-    }
-
-    /**
-     * Set the source amount into this builder.
-     *
-     * @param sourceAmount The source amount value.
-     * @return This {@link Builder} instance.
-     */
-    public Builder sourceAmount(final BigInteger sourceAmount) {
-      this.sourceAmount = Objects.requireNonNull(sourceAmount);
-      return this;
-    }
-
-    /**
-     * Set the destination hold duration into this builder.
-     *
-     * @param destinationHoldDuration An instance of {@link Duration}.
-     * @return This {@link Builder} instance.
-     */
-    public Builder destinationHoldDuration(final Duration destinationHoldDuration) {
-      this.destinationHoldDuration = Objects.requireNonNull(destinationHoldDuration);
-      return this;
+    // TODO: Create with default destinationHoldDuration
+    public static Builder builder(
+       final InterledgerAddress destinationAccount, final BigInteger sourceAmount, final Duration destinationHoldDuration) {
+      return new Builder(destinationAccount, sourceAmount, destinationHoldDuration);
     }
 
     /**
@@ -102,19 +70,9 @@ public interface QuoteBySourceAmountRequest extends QuoteRequest {
        */
       private Impl(final Builder builder) {
         Objects.requireNonNull(builder);
-
-        this.destinationAccount = Objects.requireNonNull(builder.destinationAccount,
-            "destinationAccount must not be null!");
-
-        this.sourceAmount = Objects
-            .requireNonNull(builder.sourceAmount, "sourceAmount must not be null!");
-        if (this.sourceAmount.compareTo(BigInteger.ZERO) < 0) {
-          throw new IllegalArgumentException("destinationAmount must be at least 0!");
-        }
-
-        this.destinationHoldDuration = Objects.requireNonNull(builder.destinationHoldDuration,
-            "destinationHoldDuration must not be null!");
-
+        this.destinationAccount = builder.destinationAccount;
+        this.sourceAmount = builder.sourceAmount;
+        this.destinationHoldDuration = builder.destinationHoldDuration;
       }
 
       @Override

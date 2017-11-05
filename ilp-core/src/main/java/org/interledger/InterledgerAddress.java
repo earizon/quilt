@@ -36,9 +36,7 @@ public interface InterledgerAddress {
    * @return an {@link InterledgerAddress} instance.
    */
   static InterledgerAddress of(final String value) {
-    return new Builder()
-        .value(value)
-        .build();
+    return new Builder(value).build();
   }
 
   /**
@@ -99,15 +97,6 @@ public interface InterledgerAddress {
     } else {
       return ledgerPrefix;
     }
-  }
-
-  /**
-   * Get the default builder.
-   *
-   * @return a {@link Builder} instance.
-   */
-  static Builder builder() {
-    return new Builder();
   }
 
   /**
@@ -180,7 +169,7 @@ public interface InterledgerAddress {
     }
     sb.append(addressSegment);
 
-    return builder().value(sb.toString()).build();
+    return Builder.builder(sb.toString()).build();
   }
 
   /**
@@ -241,12 +230,36 @@ public interface InterledgerAddress {
    */
   class Builder {
 
-    private String value;
+    final private String value;
+
+    private Builder(final String value) {
+        this.value = value;
+    }
+
+    public static Builder builder(final String value) {
+        return new Builder(value);
+    }
+
+    private static final String REGEX = "(?=^.{1,1023}$)"
+        + "^(g|private|example|peer|self|test[1-3])[.]([a-zA-Z0-9_~-]+[.])*([a-zA-Z0-9_~-]+)?$";
+
+    private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     /**
-     * No-args Constructor.
+     * Helper method to determine if an Interledger Address conforms to the specifications
+     * outlined in Interledger RFC #15.
+     *
+     * @param value A {@link String} representing a potential Interledger Address value.
+     *
+     * @return {@code true} if the supplied {@code value} conforms to the requirements of RFC 15;
+     *     {@code false} otherwise.
+     *
+     * @see "https://github.com/interledger/rfcs/tree/master/0015-ilp-addresses"
      */
-    private Builder() {
+    private boolean isValidInterledgerAddress(final String value) {
+      Objects.requireNonNull(value);
+      return PATTERN.matcher(value)
+          .matches();
     }
 
     /**
@@ -255,19 +268,15 @@ public interface InterledgerAddress {
      * @return An {@link InterledgerAddress} instance
      */
     public InterledgerAddress build() {
-      return new Impl(this);
-    }
+        if (!isValidInterledgerAddress(value)) {
+          throw new IllegalArgumentException(
+              String.format(
+                  "Invalid characters in address: ['%s']. "
+                      + "Reference Interledger RFC-15 for proper format.", value)
+          );
+        }
 
-    /**
-     * Assign a new value to this builder.
-     *
-     * @param value A {@link String} representing this builder's "value", which is the string
-     *              version of an Interledger Address.
-     * @return This {@link Builder} instance.
-     */
-    public Builder value(final String value) {
-      this.value = value;
-      return this;
+      return new Impl(this);
     }
 
     /**
@@ -275,11 +284,6 @@ public interface InterledgerAddress {
      * of this class, use an instance of {@link Builder}.
      */
     private static final class Impl implements InterledgerAddress {
-
-      private static final String REGEX = "(?=^.{1,1023}$)"
-          + "^(g|private|example|peer|self|test[1-3])[.]([a-zA-Z0-9_~-]+[.])*([a-zA-Z0-9_~-]+)?$";
-
-      private static final Pattern PATTERN = Pattern.compile(REGEX);
 
       private final String value;
 
@@ -292,33 +296,8 @@ public interface InterledgerAddress {
         Objects.requireNonNull(builder, "Builder must not be null!");
         Objects.requireNonNull(builder.value, "value must not be null!");
 
-        if (!isValidInterledgerAddress(builder.value)) {
-          throw new IllegalArgumentException(
-              String.format(
-                  "Invalid characters in address: ['%s']. "
-                      + "Reference Interledger RFC-15 for proper format.",
-                  builder.value)
-          );
-        }
 
         this.value = builder.value;
-      }
-
-      /**
-       * Helper method to determine if an Interledger Address conforms to the specifications
-       * outlined in Interledger RFC #15.
-       *
-       * @param value A {@link String} representing a potential Interledger Address value.
-       *
-       * @return {@code true} if the supplied {@code value} conforms to the requirements of RFC 15;
-       *     {@code false} otherwise.
-       *
-       * @see "https://github.com/interledger/rfcs/tree/master/0015-ilp-addresses"
-       */
-      private boolean isValidInterledgerAddress(final String value) {
-        Objects.requireNonNull(value);
-        return PATTERN.matcher(value)
-            .matches();
       }
 
       /**

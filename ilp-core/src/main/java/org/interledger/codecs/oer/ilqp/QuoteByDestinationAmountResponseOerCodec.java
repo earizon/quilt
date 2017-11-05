@@ -38,8 +38,9 @@ public class QuoteByDestinationAmountResponseOerCodec
     /* read the source hold duration which is a unit32 */
     long sourceHoldDuration = context.read(OerUint32.class, inputStream).getValue();
 
-    return QuoteByDestinationAmountResponse.Builder.builder().sourceAmount(sourceAmount)
-        .sourceHoldDuration(Duration.of(sourceHoldDuration, ChronoUnit.MILLIS)).build();
+    return QuoteByDestinationAmountResponse.Builder.
+            builder(sourceAmount, Duration.of(sourceHoldDuration, ChronoUnit.MILLIS))
+           .build();
   }
 
   @Override

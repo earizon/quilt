@@ -12,13 +12,15 @@ import java.util.Objects;
  */
 public class PskEncryptionHeader extends PskMessage.Header {
 
+  private final byte[]EmptyAuthTag = new byte[]{};
+
   private final byte[] authTag;
   private final PskEncryptionType type;
 
   private PskEncryptionHeader() {
     super(WellKnown.ENCRYPTION, PskEncryptionType.NONE.toString());
     this.type = PskEncryptionType.NONE;
-    this.authTag = null;
+    this.authTag = EmptyAuthTag;
   }
 
   private PskEncryptionHeader(byte[] authTag) {
@@ -87,9 +89,9 @@ public class PskEncryptionHeader extends PskMessage.Header {
    * @return the authentication tag in {@link byte[]} format.
    */
   public byte[] getAuthenticationTag() {
-    if (type == PskEncryptionType.NONE) {
-      return null;
-    }
+    // if (type == PskEncryptionType.NONE) {
+    //   return null;
+    // }
     return Arrays.copyOf(authTag, authTag.length);
   }
 

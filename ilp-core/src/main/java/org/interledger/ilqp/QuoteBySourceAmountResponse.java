@@ -19,50 +19,23 @@ public interface QuoteBySourceAmountResponse extends QuoteResponse {
   BigInteger getDestinationAmount();
 
   /**
-   * Helper-method to access a new {@link Builder} instance.
-   *
-   * @return A {@link Builder}.
-   */
-  static Builder builder() {
-    return new Builder();
-  }
-
-  /**
    * A builder for constructing instances of {@link QuoteBySourceAmountResponse}.
    */
   class Builder {
 
-    private BigInteger destinationAmount;
-    private Duration sourceHoldDuration;
+    final private BigInteger destinationAmount;
+    final private Duration sourceHoldDuration;
 
+    Builder (BigInteger destinationAmount, Duration sourceHoldDuration) {
+      this.destinationAmount  = destinationAmount;
+      this.sourceHoldDuration = sourceHoldDuration;
+    }
     /**
      * Constructs a new builder.
      * @return A new {@link Builder} instance.
      */
-    public static Builder builder() {
-      return new Builder();
-    }
-
-    /**
-     * Set the destination amount into this builder.
-     *
-     * @param destinationAmount The destination amount value.
-     * @return This {@link Builder} instance.
-     */
-    public Builder destinationAmount(final BigInteger destinationAmount) {
-      this.destinationAmount = Objects.requireNonNull(destinationAmount);
-      return this;
-    }
-
-    /**
-     * Set the source hold duration into this builder.
-     *
-     * @param sourceHoldDuration An instance of {@link Duration}.
-     * @return This {@link Builder} instance.
-     */
-    public Builder sourceHoldDuration(final Duration sourceHoldDuration) {
-      this.sourceHoldDuration = Objects.requireNonNull(sourceHoldDuration);
-      return this;
+    public static Builder builder(BigInteger destinationAmount, Duration sourceHoldDuration) {
+      return new Builder(destinationAmount, sourceHoldDuration);
     }
 
     /**

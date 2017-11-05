@@ -1,5 +1,7 @@
 package org.interledger.codecs;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,6 +28,8 @@ public abstract class AbstractCodec<T> implements Codec<T> {
    *
    * @return An instance of {@link T} as decoded of {@code inputStream}.
    */
+
+  @NonNull
   public T read(CodecContext context, InputStream inputStream) {
     Objects.requireNonNull(context);
     Objects.requireNonNull(inputStream);
@@ -56,6 +60,7 @@ public abstract class AbstractCodec<T> implements Codec<T> {
    *
    * @return An instance of {@link T}.
    */
+  @NonNull
   protected abstract T readObject(CodecContext context, InputStream inputStream);
 
 }

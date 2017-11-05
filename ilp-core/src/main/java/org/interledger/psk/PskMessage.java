@@ -1,14 +1,11 @@
 package org.interledger.psk;
 
+import android.annotation.Nullable;
 import org.interledger.InterledgerRuntimeException;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAmount;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -19,14 +16,6 @@ public interface PskMessage {
 
   String STATUS_LINE = "PSK/1.0";
 
-  /**
-   * Get the default builder.
-   *
-   * @return a {@link Builder} instance.
-   */
-  static Builder builder() {
-    return new Builder();
-  }
 
   /**
    * Returns a list of all public headers in the message. Note that all parties may view the public
@@ -168,11 +157,14 @@ public interface PskMessage {
    */
   class Builder {
 
+    private final byte[] EmptyData = new byte[]{};
     private final List<Header> publicHeaders;
     private final List<Header> privateHeaders;
-
     private byte[] data;
+
+    @Nullable
     private PskNonceHeader nonceHeader = null;
+    @Nullable
     private PskEncryptionHeader encryptionHeader = null;
 
 
@@ -181,9 +173,25 @@ public interface PskMessage {
        * we choose array lists to maintain insertion order, and to allow duplicates. the PSK RFC is
        * not explicit, but since its inspired by HTTP which allows duplicates, we presume the same.
        */
-      publicHeaders = new ArrayList<>();
-      privateHeaders = new ArrayList<>();
+      this.publicHeaders = new ArrayList<>();
+      this.privateHeaders = new ArrayList<>();
+      this.data = EmptyData;
     }
+
+    /**
+     * Get the default builder.
+     *
+     * @return a {@link Builder} instance.
+     */
+    public static Builder builder() {
+      return new Builder();
+    }
+
+    public Builder data(byte[] data) {
+      this.data = data;
+      return this;
+    }
+
 
     /**
      * Adds a header to the <b>public</b> portion of the PSK message. Note that public headers are
@@ -293,18 +301,6 @@ public interface PskMessage {
     }
 
     /**
-     * Sets the decrypted data contained in the body of the PSK message.
-     *
-     * @param data The data to store in the message.
-     * @return This {@link Builder} instance.
-     */
-    public Builder data(final byte[] data) {
-      Objects.requireNonNull(data, "Cannot add null data");
-      this.data = data;
-      return this;
-    }
-
-    /**
      * Convenience method looks at the encryption header that has been added and determines if the
      * message uses encryption or not.
      *
@@ -317,7 +313,7 @@ public interface PskMessage {
      */
     public boolean usesEncryption() {
       Objects.requireNonNull(encryptionHeader, "No encryption header added.");
-      return (encryptionHeader.getEncryptionType() != PskEncryptionType.NONE);
+      return (encryptionHeader!=null && encryptionHeader.getEncryptionType() != PskEncryptionType.NONE);
     }
 
     /**
@@ -326,6 +322,9 @@ public interface PskMessage {
      * @return A new {@link PskMessage} instance.
      */
     public PskMessage build() {
+      if (data == EmptyData ) {
+        throw new RuntimeException("data not provided");
+      }
       return new Impl(this);
     }
 

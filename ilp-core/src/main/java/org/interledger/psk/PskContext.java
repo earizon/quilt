@@ -381,7 +381,7 @@ public interface PskContext {
           encryptionHeader.getAuthenticationTag(), nonceHeader.getNonce(), message.getData());
 
       PskMessage privateMessage = new PskMessageBinaryCodec().parsePrivateData(decryptedData);
-      PskMessage.Builder builder = PskMessage.builder();
+      PskMessage.Builder builder = PskMessage.Builder.builder().data(privateMessage.getData());
 
       message.getPublicHeaders()
           .stream()
@@ -398,7 +398,6 @@ public interface PskContext {
       builder.addPublicHeader(PskEncryptionHeader.none());
       builder.addPublicHeader(message.getNonceHeader());
 
-      builder.data(privateMessage.getData());
       return builder.build();
     }
 
@@ -426,7 +425,7 @@ public interface PskContext {
       AesGcmEncryptResult result =
           PskCryptoUtils.encryptPskData(encryptionKey, nonceHeader.getNonce(), encryptedData);
 
-      PskMessage.Builder builder = PskMessage.builder();
+      PskMessage.Builder builder = PskMessage.Builder.builder().data(result.getEncryptedData());
 
       message.getPublicHeaders()
           .stream()
@@ -439,7 +438,6 @@ public interface PskContext {
       builder.addPublicHeader(PskEncryptionHeader.aesGcm(result.getAuthenticationTag()));
       builder.addPublicHeader(nonceHeader);
 
-      builder.data(result.getEncryptedData());
       return builder.build();
 
     }

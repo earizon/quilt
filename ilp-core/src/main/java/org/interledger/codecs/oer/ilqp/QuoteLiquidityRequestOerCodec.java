@@ -37,9 +37,8 @@ public class QuoteLiquidityRequestOerCodec implements QuoteLiquidityRequestCodec
     /* read the destination hold duration which is a unit32 */
     long destinationHoldDuration = context.read(OerUint32.class, inputStream).getValue();
 
-    return QuoteLiquidityRequest.Builder.builder()
-        .destinationAccount(destinationAccount)
-        .destinationHoldDuration(Duration.of(destinationHoldDuration, ChronoUnit.MILLIS))
+    return QuoteLiquidityRequest.Builder.
+        builder(destinationAccount,Duration.of(destinationHoldDuration, ChronoUnit.MILLIS))
         .build();
   }
 

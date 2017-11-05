@@ -55,53 +55,16 @@ public interface QuoteLiquidityResponse extends QuoteResponse {
    */
   class Builder {
 
-    private LiquidityCurve liquidityCurve;
-    private InterledgerAddress appliesTo;
-    private Duration sourceHoldDuration;
-    private Instant expiresAt;
+    final private LiquidityCurve liquidityCurve;
+    final private InterledgerAddress appliesTo;
+    final private Duration sourceHoldDuration;
+    final private Instant expiresAt;
 
-    /**
-     * Set the liquidity curve into this builder.
-     *
-     * @param liquidityCurve To An instance of {@link LiquidityCurve}.
-     * @return This {@link Builder} instance.
-     */
-    public Builder liquidityCurve(final LiquidityCurve liquidityCurve) {
-      this.liquidityCurve = Objects.requireNonNull(liquidityCurve);
-      return this;
-    }
-
-    /**
-     * Set the applies-to address into this builder.
-     *
-     * @param appliesTo An instance of {@link InterledgerAddress}.
-     * @return This {@link Builder} instance.
-     */
-    public Builder appliesTo(final InterledgerAddress appliesTo) {
-      this.appliesTo = Objects.requireNonNull(appliesTo);
-      return this;
-    }
-
-    /**
-     * Set the source hold duration into this builder.
-     *
-     * @param sourceHoldDuration An instance of {@link Duration}.
-     * @return This {@link Builder} instance.
-     */
-    public Builder sourceHoldDuration(final Duration sourceHoldDuration) {
-      this.sourceHoldDuration = Objects.requireNonNull(sourceHoldDuration);
-      return this;
-    }
-
-    /**
-     * Set the expires-at into this builder.
-     *
-     * @param expiresAt An instance of {@link Instant}
-     * @return This {@link Builder} instance.
-     */
-    public Builder expiresAt(final Instant expiresAt) {
-      this.expiresAt = Objects.requireNonNull(expiresAt);
-      return this;
+    public Builder (LiquidityCurve liquidityCurve, InterledgerAddress appliesTo, Duration sourceHoldDuration, Instant expiresAt) {
+      this.liquidityCurve     = liquidityCurve;
+      this.appliesTo          = appliesTo;
+      this.sourceHoldDuration = sourceHoldDuration;
+      this.expiresAt          = expiresAt;
     }
 
     /**
@@ -117,8 +80,8 @@ public interface QuoteLiquidityResponse extends QuoteResponse {
      * Constructs a new builder.
      * @return A new instance of {@link Builder}
      */
-    public static Builder builder() {
-      return new Builder();
+    public static Builder builder(LiquidityCurve liquidityCurve, InterledgerAddress appliesTo, Duration sourceHoldDuration, Instant expiresAt) {
+      return new Builder(liquidityCurve, appliesTo, sourceHoldDuration, expiresAt);
     }
 
 
@@ -132,16 +95,10 @@ public interface QuoteLiquidityResponse extends QuoteResponse {
       private Impl(Builder builder) {
         Objects.requireNonNull(builder);
 
-        this.liquidityCurve =
-            Objects.requireNonNull(builder.liquidityCurve, "Liquidity curve must not be null!.");
-
-        this.appliesTo =
-            Objects.requireNonNull(builder.appliesTo, "Applies-to address must not be null.!");
-
-        this.sourceHoldDuration = Objects.requireNonNull(builder.sourceHoldDuration,
-            "sourceHoldDuration must not be null!");
-
-        this.expiresAt = Objects.requireNonNull(builder.expiresAt, "Expires-at must not be null!.");
+        this.liquidityCurve = builder.liquidityCurve;
+        this.appliesTo = builder.appliesTo;
+        this.sourceHoldDuration = builder.sourceHoldDuration;
+        this.expiresAt = builder.expiresAt;
       }
 
       @Override

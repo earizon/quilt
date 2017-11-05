@@ -43,9 +43,11 @@ public class QuoteByDestinationAmountRequestOerCodec
     /* read the destination hold duration which is a unit32 */
     final long destinationHoldDuration = context.read(OerUint32.class, inputStream).getValue();
 
-    return QuoteByDestinationAmountRequest.Builder.builder().destinationAccount(destinationAccount)
-        .destinationAmount(destinationAmount)
-        .destinationHoldDuration(Duration.of(destinationHoldDuration, ChronoUnit.MILLIS)).build();
+    return QuoteByDestinationAmountRequest.Builder.builder(
+            destinationAccount,
+            destinationAmount,
+            Duration.of(destinationHoldDuration, ChronoUnit.MILLIS))
+            .build();
   }
 
   @Override

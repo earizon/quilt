@@ -95,7 +95,7 @@ public class PskMessageBinaryCodec implements PskMessageCodec {
 
     Objects.requireNonNull(inputStream);
 
-    PskMessage.Builder builder = PskMessage.builder();
+    PskMessage.Builder builder = PskMessage.Builder.builder();
     ReadState currentState = state;
 
     while (true) {

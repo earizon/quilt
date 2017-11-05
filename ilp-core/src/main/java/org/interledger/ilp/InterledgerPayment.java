@@ -43,15 +43,6 @@ import java.util.Objects;
 public interface InterledgerPayment extends InterledgerPacket {
 
   /**
-   * Get the default builder.
-   *
-   * @return a {@link Builder} instance.
-   */
-  static Builder builder() {
-    return new Builder();
-  }
-
-  /**
    * The Interledger address of the account where the receiver should ultimately receive the
    * payment.
    *
@@ -80,42 +71,19 @@ public interface InterledgerPayment extends InterledgerPacket {
    */
   class Builder {
 
-    private InterledgerAddress destinationAccount;
-    private BigInteger destinationAmount;
-    private byte[] data;
+    final private InterledgerAddress destinationAccount;
+    final private BigInteger destinationAmount;
+    final private byte[] data;
 
-    /**
-     * Set the destination account address into this builder.
-     *
-     * @param destinationAccount An instance of {@link InterledgerAddress}.
-     * @return This {@link Builder} instance.
-     */
-    public Builder destinationAccount(final InterledgerAddress destinationAccount) {
-      this.destinationAccount = Objects.requireNonNull(destinationAccount);
-      return this;
+    public Builder(final InterledgerAddress destinationAccount, final BigInteger destinationAmount, final byte[] data) {
+      this.destinationAccount = destinationAccount;
+      this.destinationAmount  = destinationAmount ;
+      this.data               = data              ;
     }
 
-    /**
-     * Set the destination amount into this builder.
-     *
-     * @param destinationAmount An instance of {@link BigInteger}.
-     *
-     * @return This {@link Builder} instance.
-     */
-    public Builder destinationAmount(final BigInteger destinationAmount) {
-      this.destinationAmount = Objects.requireNonNull(destinationAmount);
-      return this;
-    }
 
-    /**
-     * Set the data payload for this payment.
-     *
-     * @param data An instance of {@link byte[]}. May be empty but may not be null.
-     * @return This {@link Builder} instance.
-     */
-    public Builder data(final byte[] data) {
-      this.data = Objects.requireNonNull(data);
-      return this;
+    public static Builder builder(final InterledgerAddress destinationAccount, final BigInteger destinationAmount, final byte[] data) {
+      return new Builder(destinationAccount, destinationAmount, data);
     }
 
     /**
@@ -141,11 +109,9 @@ public interface InterledgerPayment extends InterledgerPacket {
        */
       private Impl(final Builder builder) {
         Objects.requireNonNull(builder);
-        this.destinationAccount = Objects.requireNonNull(builder.destinationAccount,
-            "destinationAccount must not be null!");
-        this.destinationAmount = Objects.requireNonNull(builder.destinationAmount,
-            "destinationAmount must not be null!");
-        this.data = Objects.requireNonNull(builder.data, "data must not be null!");
+        this.destinationAccount = builder.destinationAccount;
+        this.destinationAmount  = builder.destinationAmount;
+        this.data               = builder.data;
       }
 
       @Override

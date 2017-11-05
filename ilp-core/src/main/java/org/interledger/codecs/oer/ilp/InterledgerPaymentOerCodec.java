@@ -63,11 +63,10 @@ public class InterledgerPaymentOerCodec implements InterledgerPaymentCodec {
     final byte[] data = context.read(OerOctetString.class, inputStream)
         .getValue();
 
-    return InterledgerPayment.builder()
-        .destinationAmount(destinationAmount)
-        .destinationAccount(destinationAccount)
-        .data(data)
-        .build();
+    return InterledgerPayment.Builder.builder(
+            destinationAccount,
+            destinationAmount,
+            data).build();
   }
 
   @Override

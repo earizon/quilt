@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Objects;
@@ -49,7 +48,7 @@ public class QuoteLiquidityResponseOerCodec implements QuoteLiquidityResponseCod
       final BigInteger y = context.read(OerUint64.class, inputStream).getValue();
 
       final LiquidityPoint point =
-          LiquidityPoint.Builder.builder().inputAmount(x).outputAmount(y).build();
+          LiquidityPoint.Builder.builder(x,y).build();
 
       curveBuilder.liquidityPoint(point);
     }
@@ -63,12 +62,12 @@ public class QuoteLiquidityResponseOerCodec implements QuoteLiquidityResponseCod
     /* read the expires-at timestamp */
     Instant expiresAt = context.read(OerGeneralizedTime.class, inputStream).getValue();
 
-    return QuoteLiquidityResponse.Builder.builder()
-        .liquidityCurve(curveBuilder.build())
-        .appliesTo(appliesTo)
-        .sourceHoldDuration(Duration.of(sourceHoldDuration, ChronoUnit.MILLIS))
-        .expiresAt(expiresAt)
-        .build();
+    return QuoteLiquidityResponse.Builder.builder(
+            curveBuilder.build(),
+            appliesTo,
+            Duration.of(sourceHoldDuration, ChronoUnit.MILLIS),
+            expiresAt
+            ).build();
   }
 
   @Override

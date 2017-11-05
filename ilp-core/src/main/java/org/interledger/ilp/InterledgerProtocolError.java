@@ -8,6 +8,7 @@ import org.interledger.InterledgerAddress;
 import org.interledger.InterledgerPacket;
 import org.interledger.InterledgerRuntimeException;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -68,15 +69,6 @@ public interface InterledgerProtocolError extends InterledgerPacket {
   Optional<byte[]> getData();
 
   /**
-   * Get the default builder.
-   *
-   * @return a {@link Builder} instance.
-   */
-  static Builder builder() {
-    return new Builder();
-  }
-
-  /**
    * <p>Constructs an {@link InterledgerProtocolError} that wraps an existing error and adds a new
    * forwardedBy address to the list.</p>
    *
@@ -93,8 +85,7 @@ public interface InterledgerProtocolError extends InterledgerPacket {
       final InterledgerProtocolError interledgerProtocolError,
       final InterledgerAddress forwardedByAddress
   ) {
-    return new Builder(interledgerProtocolError).addForwardedByAddress(forwardedByAddress)
-        .build();
+    return new Builder(interledgerProtocolError, forwardedByAddress).build();
   }
 
   /**
@@ -106,21 +97,24 @@ public interface InterledgerProtocolError extends InterledgerPacket {
    */
   class Builder {
 
-    private ErrorCode errorCode;
-    private InterledgerAddress triggeredByAddress;
-    private List<InterledgerAddress> forwardedByAddresses;
-    private Instant triggeredAt;
+    final private ErrorCode errorCode;
+    final private InterledgerAddress triggeredByAddress;
+    final private List<InterledgerAddress> forwardedByAddresses;
+    private Instant triggeredAt = Instant.MIN;
     private Optional<byte[]> data;
 
-    /**
-     * No-args Constructor.
-     */
-    public Builder() {
-      this.forwardedByAddresses = new LinkedList<>();
+    public Builder(ErrorCode errorCode, InterledgerAddress triggeredByAddress, List<InterledgerAddress> forwardedByAddresses) {
+      this.errorCode             = errorCode;
+      this.triggeredByAddress    = triggeredByAddress;
+      // Defensive copy here, just in case the list is taken from an existing
+      // InterledgerProtocolError.
+      this.forwardedByAddresses  = forwardedByAddresses.stream()
+          .collect(
+              Collectors.toList());;
       data = Optional.empty();
     }
 
-    public Builder(final InterledgerProtocolError interledgerProtocolError) {
+    public Builder(final InterledgerProtocolError interledgerProtocolError, InterledgerAddress forwardedByAddress) {
       Objects.requireNonNull(interledgerProtocolError);
 
       this.errorCode = interledgerProtocolError.getErrorCode();
@@ -142,36 +136,12 @@ public interface InterledgerProtocolError extends InterledgerPacket {
      *         builder.
      */
     public InterledgerProtocolError build() {
+      triggeredAt = (triggeredAt == Instant.MIN) ? Instant.now() : triggeredAt;
       return new Impl(this);
     }
 
-    public Builder errorCode(final ErrorCode errorCode) {
-      this.errorCode = Objects.requireNonNull(errorCode, "errorCode must not be null!");
-      return this;
-    }
-
-    public Builder triggeredByAddress(final InterledgerAddress triggeredByAddress) {
-      this.triggeredByAddress = Objects
-          .requireNonNull(triggeredByAddress, "triggeredByAddress must not be null!");
-      return this;
-    }
-
-    public Builder forwardedByAddresses(final List<InterledgerAddress> forwardedByAddresses) {
-      this.forwardedByAddresses = Objects
-          .requireNonNull(forwardedByAddresses, "forwardedByAddresses must not be null!");
-      return this;
-    }
-
-    public Builder addForwardedByAddress(final InterledgerAddress forwardedByAddress) {
-      this.forwardedByAddresses
-          .add(Objects
-              .requireNonNull(forwardedByAddress, "forwardedByAddress must not be null!"));
-      return this;
-    }
-
-
-    public Builder triggeredAt(final Instant triggeredAt) {
-      this.triggeredAt = Objects.requireNonNull(triggeredAt, "triggeredAt must not be null!");
+    public Builder setTriggeredAt(Instant triggeredAt) {
+      this.triggeredAt = triggeredAt;
       return this;
     }
 
@@ -196,10 +166,8 @@ public interface InterledgerProtocolError extends InterledgerPacket {
       private Impl(final Builder builder) {
         Objects.requireNonNull(builder);
 
-        this.errorCode = Objects
-            .requireNonNull(builder.errorCode, "errorCode must not be null!");
-        this.triggeredByAddress = Objects
-            .requireNonNull(builder.triggeredByAddress, "triggeredByAddress must not be null!");
+        this.errorCode = builder.errorCode;
+        this.triggeredByAddress = builder.triggeredByAddress;
 
         // Disallow the triggeredBy from being included in the forwardedBy. The rationale is that
         // the triggering node should not accidentally add itself to the forwarding addresses.
@@ -216,15 +184,9 @@ public interface InterledgerProtocolError extends InterledgerPacket {
                           + "indicates an Interledger packet loop!", triggeredByAddress));
             }
           );
-
-        // Defensively copy the list of addresses so that mutating the builder doesn't affect this.
-        this.forwardedByAddresses = Objects.requireNonNull(
-            builder.forwardedByAddresses.stream().collect(Collectors.toList()),
-            "forwardedByAddresses must not be null!"
-        );
-
-        this.triggeredAt = Optional.ofNullable(builder.triggeredAt).orElse(Instant.now());
-        this.data = Objects.requireNonNull(builder.data, "data must not be null!");
+        this.forwardedByAddresses = builder.forwardedByAddresses;
+        this.triggeredAt = builder.triggeredAt;
+        this.data = builder.data;
       }
 
       @Override
@@ -354,7 +316,7 @@ public interface InterledgerProtocolError extends InterledgerPacket {
      * @return An {@link ErrorCode}
      */
     static ErrorCode of(final String code, final String name) {
-      return new Builder().setCode(code).setName(name).build();
+      return new Builder(code,name).build();
     }
 
     /**
@@ -362,17 +324,12 @@ public interface InterledgerProtocolError extends InterledgerPacket {
      */
     final class Builder {
 
-      private String code;
-      private String name;
+      final private String code;
+      final private String name;
 
-      public Builder setCode(final String code) {
-        this.code = Objects.requireNonNull(code);
-        return this;
-      }
-
-      public Builder setName(final String name) {
-        this.name = Objects.requireNonNull(name);
-        return this;
+      Builder(final String code, final String name) {
+        this.code = code;
+        this.name = name;
       }
 
       public ErrorCode build() {
