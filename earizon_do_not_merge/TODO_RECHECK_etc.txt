@@ -1,0 +1,51 @@
+Check https://github.com/hyperledger/quilt/pull/165#discussion_r210803401
+
+
+Create java interfaces for ILPAccountManager and ILPTransferManager:
+
+The ILPAccountManager and ILPTransferManager will "mark" all required functionality needed in ILP.
+
+Ledgers adding "native" support for ILP are supposed to implement the functionality described by the interfaces. Those interfaces can be seen as a help, tutorial or guide but developers are free to ignore it and implement it in any other sensible way.
+
+
+
+The ILPAccountManager can be something similar to:
+https://github.com/earizon/java-vertx-ledger/blob/earizon-Java2Kotlin/src/main/java/com/everis/everledger/ifaces/account/IfaceILPSpecAccountManager.java
+
+limiting to return the existing HOLD account used for ILP escrow.
+
+
+An example usage is available at:
+https://github.com/earizon/java-vertx-ledger/blob/earizon-Java2Kotlin/src/main/java/com/everis/everledger/impl/manager/SimpleTransferManagerMod.kt
+ 
+(Notice in Kotling .holdAccountILP translates to getHoldAccountILP() in java)
+
+
+The ILPTransferManager can be something similar to:
+
+https://github.com/earizon/java-vertx-ledger/blob/master/src/main/java/com/everis/everledger/ifaces/transfer/IfaceILPSpecTransferManager.java
+
+implementing the methods 
+ILPTransfer getTransfersByExecutionCondition(Condition cond)
+void proposeILPTransfer(ILPTransfer newTransfer);
+void prepareILPTransfer(ILPTransfer newTransfer);
+void executeILPTransfer(ILPTransfer transfer, Fulfillment executionFulfillment);
+void cancelILPTransfer(ILPTransfer transfer, Fulfillment cancellationFulfillment);
+boolean doesILPTransferExists(UUID transferId);
+
+
+----------------------------
+
+Rename org.interledger.ledger.model.LedgerTransfer as org.interledger.ledger.model.ILPTransfer.
+
+This makes it clear it refers to the contract needed to be implemented by ledgers supporting ILP. 
+The ledger concrete implementation most probably will also implement other non-ILP-related interfaces (for already existing "local" transfers, "remote blockchain" transfers, ...). 
+
+As an example in the java-vertx-ledger a ledger is suppose to already implement some short of local transfer before adding ILP support. A generic  IFaceTransfer extends all needed *Transfer interfaces with the ILP interface beeing just one amongst others:
+https://github.com/earizon/java-vertx-ledger/blob/master/src/main/java/com/everis/everledger/ifaces/transfer/IfaceTransfer.java
+
+Developers just need to implement the generic interface.
+
+
+
+
